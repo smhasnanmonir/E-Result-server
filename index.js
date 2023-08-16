@@ -40,7 +40,7 @@ async function run() {
       .db("Eresult")
       .collection("resultCollection");
     app.get("/allResults", async (req, res) => {
-      const results = await resultCollection.find().toArray();
+      const results = await resultCollection.find({}).toArray();
       res.send(results);
     });
   } finally {

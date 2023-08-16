@@ -1,0 +1,247 @@
+[
+  {
+    "Name": "Hasnan Monir",
+    "classId": 1223,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "79"
+          },
+          {
+            "subjectName": "English",
+            "number": "90"
+          },
+          {
+            "subjectName": "Math",
+            "number": "70"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "90"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "90"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "90"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "Ishrafil Vhai",
+    "classId": 1224,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "95"
+          },
+          {
+            "subjectName": "English",
+            "number": "70"
+          },
+          {
+            "subjectName": "Math",
+            "number": "80"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "85"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "87"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "92"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "John Doe",
+    "classId": 4567,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "85"
+          },
+          {
+            "subjectName": "English",
+            "number": "72"
+          },
+          {
+            "subjectName": "Math",
+            "number": "90"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "88"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "93"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "79"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "Alice Smith",
+    "classId": 7890,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "78"
+          },
+          {
+            "subjectName": "English",
+            "number": "92"
+          },
+          {
+            "subjectName": "Math",
+            "number": "84"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "87"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "81"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "89"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "Emily Johnson",
+    "classId": 1234,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "92"
+          },
+          {
+            "subjectName": "English",
+            "number": "80"
+          },
+          {
+            "subjectName": "Math",
+            "number": "86"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "79"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "91"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "83"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "Michael Brown",
+    "classId": 2345,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "80"
+          },
+          {
+            "subjectName": "English",
+            "number": "88"
+          },
+          {
+            "subjectName": "Math",
+            "number": "79"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "92"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "85"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "87"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Name": "Sophia Miller",
+    "classId": 3456,
+    "section": 14,
+    "result": [
+      {
+        "midTerm": [
+          {
+            "subjectName": "Bangla",
+            "number": "87"
+          },
+          {
+            "subjectName": "English",
+            "number": "85"
+          },
+          {
+            "subjectName": "Math",
+            "number": "91"
+          },
+          {
+            "subjectName": "Physics",
+            "number": "76"
+          },
+          {
+            "subjectName": "Chemistry",
+            "number": "84"
+          },
+          {
+            "subjectName": "Biology",
+            "number": "90"
+          }
+        ]
+      }
+    ]
+  }
+]
