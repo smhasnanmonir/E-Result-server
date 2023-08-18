@@ -14,7 +14,7 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -42,6 +42,19 @@ async function run() {
     app.get("/allResults", async (req, res) => {
       const results = await resultCollection.find({}).toArray();
       res.send(results);
+    });
+
+    app.get("/allResults/:classId", async (req, res) => {
+      const classId = parseInt(req.params.classId);
+      const result = await resultCollection.findOne({ classId: classId });
+      res.send(result);
+    });
+    app.get("/allResults/section/:section", async (req, res) => {
+      const section = parseInt(req.params.section);
+      const result = await resultCollection
+        .find({ section: section })
+        .toArray();
+      res.send(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error
