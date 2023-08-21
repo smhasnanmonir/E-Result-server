@@ -5,12 +5,6 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 require("dotenv").config();
-app.get("/", (req, res) => {
-  res.send("E result server is running");
-});
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
@@ -58,4 +52,9 @@ async function run() {
   }
 }
 run().catch(console.dir);
-module.exports = app;
+app.get("/", (req, res) => {
+  res.send("E result server is running");
+});
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
