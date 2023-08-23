@@ -46,15 +46,12 @@ async function run() {
 
     app.get("/allResults", async (req, res) => {
       const results = await resultCollection.find({}).toArray();
-
       res.send(results);
     });
 
     app.get("/allResults/:classId", async (req, res) => {
       const classId = parseInt(req.params.classId);
-
       const result = await resultCollection.findOne({ classId: classId });
-
       res.send(result);
     });
 
@@ -68,6 +65,21 @@ async function run() {
         .toArray();
 
       res.send(result);
+    });
+
+    app.get("/allResults/:examType/:classId", async (req, res) => {
+      const examType = req.params.examType.toString();
+      const classId = parseInt(req.params.classId);
+      const document = await resultCollection.findOne({ classId: classId });
+      if (examType === "midTerm") {
+        const examData = document?.result[0]?.midTerm;
+        res.send({ examData });
+      } else if (examType === "finalTerm") {
+        const examData = document?.result[1]?.finalTerm;
+        res.send({ examData });
+      } else {
+        res.send("Not Found");
+      }
     });
 
     // Send a ping to confirm a successful connection
