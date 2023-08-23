@@ -54,6 +54,12 @@ async function run() {
       res.send(results);
     });
 
+    app.post("/allResults", async (req, res) => {
+      const newItem = req.body;
+      const result = await reCheckCollection.insertOne(newItem);
+      res.send(result);
+    });
+
     app.get("/allResults/:classId", async (req, res) => {
       const classId = parseInt(req.params.classId);
       const result = await resultCollection.findOne({ classId: classId });
