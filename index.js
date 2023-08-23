@@ -42,7 +42,12 @@ async function run() {
 
       .db("Eresult")
 
-      .collection("resultCollection");
+      .collection("resultCollection"); //for getting all results
+    const reCheckCollection = client
+
+      .db("Eresult")
+
+      .collection("reCheck"); //for getting all results
 
     app.get("/allResults", async (req, res) => {
       const results = await resultCollection.find({}).toArray();
@@ -80,6 +85,28 @@ async function run() {
       } else {
         res.send("Not Found");
       }
+    });
+
+    //reCheck api
+
+    app.post("/reCheck", async (req, res) => {
+      const newItem = req.body;
+      const result = await reCheckCollection.insertOne(newItem);
+      res.send(result);
+    });
+
+    app.get("/reCheck", async (req, res) => {
+      const result = await reCheckCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/reCheck/:classId", async (req, res) => {
+      const classId = parseInt(req.params.classId);
+
+      const result = await reCheckCollection.findOne({
+        classId: parseInt(classId),
+      });
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
