@@ -16,7 +16,7 @@ app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-const uri = `mongodb+srv://toyStore:ZJAfWFIfxFf4k20E@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -47,7 +47,12 @@ async function run() {
 
       .db("Eresult")
 
-      .collection("reCheck"); //for getting all results
+      .collection("reCheck"); //for getting all rechecks
+    const usersCollection = client
+
+      .db("Eresult")
+
+      .collection("usersCollection"); //for getting all rechecks
 
     app.get("/allResults", async (req, res) => {
       const results = await resultCollection.find({}).toArray();
