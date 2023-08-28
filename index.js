@@ -16,7 +16,7 @@ app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://toyStore:ZJAfWFIfxFf4k20E@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -47,17 +47,55 @@ async function run() {
 
       .db("Eresult")
 
-      .collection("reCheck"); //for getting all rechecks
-    const usersCollection = client
+      .collection("reCheck"); //for getting all results
 
-      .db("Eresult")
-
-      .collection("usersCollection"); //for getting all rechecks
+    // app.get("/allResults", async (req, res) => {
+    //   const results = await resultCollection.find({}).toArray();
+    //   res.send(results);
+    // });
 
     app.get("/allResults", async (req, res) => {
-      const results = await resultCollection.find({}).toArray();
+      const cursor = resultCollection.find();
+      const result = await cursor.toArray()
+      res.send(result);
+    })
+
+    // search by id
+
+    app.get("/allResults/:id", async (req, res) => {
+      const allResultsId = req.params.id;
+      const query = { _id: new ObjectId(allResultsId) }
+      const option = {
+        projection: {
+          Name: 1, classId: 1, finalTerm: 1
+        }
+      }
+      const results = await resultCollection.findOne(query, option);
       res.send(results);
     });
+
+    app.patch("/allResults/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const term = req.body;
+      const final = {
+        $set: {
+          finalTerm: {
+            Bangla: parseInt(term.Bangla),
+            Biology: parseInt(term.Biology),
+            Chemistry: parseInt(term.Chemistry),
+            English: parseInt(term.English),
+            Math: parseInt(term.Math),
+            Physics: parseInt(term.Physics)
+          }
+
+        }
+      }
+      const result = await resultCollection.updateOne(filter, final, options);
+      res.send(result)
+    });
+
 
     app.post("/allResults", async (req, res) => {
       const newItem = req.body;
