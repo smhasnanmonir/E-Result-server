@@ -49,10 +49,50 @@ async function run() {
 
       .collection("reCheck"); //for getting all results
 
+    // app.get("/allResults", async (req, res) => {
+    //   const results = await resultCollection.find({}).toArray();
+    //   res.send(results);
+    // });
+
     app.get("/allResults", async (req, res) => {
-      const results = await resultCollection.find({}).toArray();
+      const cursor = resultCollection.find();
+      const result = await cursor.toArray()
+      res.send(result);
+    })
+
+      // search by id
+
+    app.get("/allResults/:id", async (req, res) => {
+      const allResultsId = req.params.id;
+      const query ={_id: new ObjectId(allResultsId)}
+      const option ={
+        projection: {
+          Name:1, classId:1,finalTerm:1
+        }
+      }
+      const results = await resultCollection.findOne(query,option);
       res.send(results);
     });
+
+    app.put("/allResults/:id", async (req, res) => {
+          const id = req.params.id;
+          const filter ={_id: new ObjectId(id)}
+          const options = {upsert: true};
+          const finalTerm = req.body;
+          const final = {
+                $set: {
+                  Bangla: parseInt(finalTerm.Bangla),
+                  Biology:parseInt(finalTerm.Biology),
+                  Chemistry: parseInt(finalTerm.Chemistry),
+                  English: parseInt(finalTerm.English),
+                  Math: parseInt(finalTerm.Math),
+                  Physics: parseInt(finalTerm.Physics),
+                }
+          }
+          const result = await resultCollection.updateOne(filter,final,options);
+          res.send(result)
+    });
+    
 
     app.post("/allResults", async (req, res) => {
       const newItem = req.body;
