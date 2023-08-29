@@ -17,9 +17,9 @@ app.use(express.json());
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const { error } = require("console");
 
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`; //use monir
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ir3lm70.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ir3lm70.mongodb.net/?retryWrites=true&w=majority`; //use habib 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -39,7 +39,6 @@ async function run() {
 
     // await client.connect();
 
-    //find data of all toys
 
     const resultCollection = client.db("Eresult").collection("resultCollection"); //for getting all results
     const reCheckCollection = client.db("Eresult").collection("reCheck"); //for getting all rechecks
@@ -111,6 +110,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/reCheckUser", async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        email: email
+      }
+      const result = await reCheckCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //User Collections API
 
     app.post('/addUser', async(req, res) => {
@@ -125,6 +133,17 @@ async function run() {
         const result = await usersCollection.insertOne(userInfo);
         res.send(result);
       }
+    })
+
+    //Checking admin or not
+    app.get('/user/isAdmin',async(req, res) => {
+      const email = req.query.email;
+ 
+      const query = {email: email}
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === 'admin'}
+    
+      return res.send(result)
     })
 
     // Send a ping to confirm a successful connection
