@@ -2,6 +2,8 @@ const express = require("express");
 
 const cors = require("cors");
 
+const jwt = require('jsonwebtoken');
+
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -12,7 +14,22 @@ app.use(cors());
 
 app.use(express.json());
 
-// mongodb connect
+const  verifyJwt = (req,res,next) => {
+  const authorization = req.headers.authorization;
+    if(!authorization) {
+      return res.status(401).send({error: true, message: 'not verify parson'})
+    }
+    const token = authorization.split(' ')[1];
+    jwt.verify(token,'c8f7271005d7cb49f09e71f9f24e8989f0126396a8a88cc1e232f15a130bf83e964e120940702b373c6fe477f69e1d9aa744e58dfc420c50f2794c424c688d91',(err,decoded) => {
+      if(err) {
+        return res.status(401).send({error: true, massage: 'not verify parson'})
+      }
+      req.decoded = decoded;
+      next()
+    })
+
+}
+
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -119,6 +136,12 @@ async function run() {
         .toArray();
 
       res.send(result);
+    });
+
+    app.post('/jwt', (req , res) => {
+      const user = req.body
+      const token = jwt.sign(user, 'c8f7271005d7cb49f09e71f9f24e8989f0126396a8a88cc1e232f15a130bf83e964e120940702b373c6fe477f69e1d9aa744e58dfc420c50f2794c424c688d91', {expiresIn: '100h'})
+      res.send(token)
     });
 
     app.get("/allResults/:examType/:classId", async (req, res) => {

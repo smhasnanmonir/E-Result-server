@@ -3,6 +3,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.1",
     "mongodb": "^5.5.0",
     "node": "^20.5.0"
   },
@@ -17,7 +18,6 @@
   "author": "",
   "license": "ISC",
   "description": "��#\u0000 \u0000E\u0000-\u0000R\u0000e\u0000s\u0000u\u0000l\u0000t\u0000-\u0000s\u0000e\u0000r\u0000v\u0000e\u0000r\u0000\r\u0000 \u0000",
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/smhasnanmonir/E-Result-server.git"
