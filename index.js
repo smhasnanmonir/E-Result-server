@@ -32,8 +32,11 @@ const  verifyJwt = (req,res,next) => {
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { error } = require("console");
 
-const uri = `mongodb+srv://toyStore:ZJAfWFIfxFf4k20E@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`; //use monir
+
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ir3lm70.mongodb.net/?retryWrites=true&w=majority`; //use habib 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -53,23 +56,10 @@ async function run() {
 
     // await client.connect();
 
-    //find data of all toys
 
-    const resultCollection = client
-
-      .db("Eresult")
-
-      .collection("resultCollection"); //for getting all results
-    const reCheckCollection = client
-
-      .db("Eresult")
-
-      .collection("reCheck"); //for getting all results
-
-    // app.get("/allResults", async (req, res) => {
-    //   const results = await resultCollection.find({}).toArray();
-    //   res.send(results);
-    // });
+    const resultCollection = client.db("Eresult").collection("resultCollection"); //for getting all results
+    const reCheckCollection = client.db("Eresult").collection("reCheck"); //for getting all rechecks
+    const usersCollection = client.db("Eresult").collection("usersCollection"); //for getting all rechecks
 
     app.get("/allResults", async (req, res) => {
       const cursor = resultCollection.find();
@@ -180,6 +170,66 @@ async function run() {
       });
       res.send(result);
     });
+
+    app.get("/reCheckUser", async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        email: email
+      }
+      const result = await reCheckCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //User Collections API
+
+    app.post('/addUser', async(req, res) => {
+      const userInfo = req.body;
+      const query = {
+        email : userInfo.email
+      }
+      const existingUser = await usersCollection.findOne(query);
+      if(existingUser){
+        res.send({message : "User already added" });
+      }else{
+        const result = await usersCollection.insertOne(userInfo);
+        res.send(result);
+      }
+    })
+
+    //Checking admin or not
+    app.get('/user/isAdmin',async(req, res) => {
+      const email = req.query.email;
+ 
+      const query = {email: email}
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === 'admin'}
+    
+      return res.send(result)
+    })
+
+    //Manage User
+    app.get('/userList', async(req, res) => {
+      const userlist = await usersCollection.find().toArray();
+      res.send(userlist);
+    });
+
+    app.patch('/userList/admin/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          role: 'admin'
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.delete('/deleteUser/:id', async(req, res) => {
+      const id = req.params.id;
+      const deleteId = { _id : new ObjectId(id) };
+      const deleteFromCollection = await usersCollection.deleteOne(deleteId);
+      res.send(deleteFromCollection);
+    })
 
     // Send a ping to confirm a successful connection
 
