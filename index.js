@@ -171,6 +171,7 @@ async function run() {
       res.send(result);
     });
 
+    //get recheck by class id(roll number)
     app.get("/reCheck/:classId", async (req, res) => {
       const classId = parseInt(req.params.classId);
 
@@ -180,20 +181,39 @@ async function run() {
       res.send(result);
     });
 
+    //get recheck by _id
     app.get("/reCheckDelete/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const deleteFromCollection = await reCheckCollection
-        .find(query)
-        .toArray();
-      res.send(deleteFromCollection);
+      const getFromCollection = await reCheckCollection.find(query).toArray();
+      res.send(getFromCollection);
     });
 
+    //recheck delete from collection
     app.delete("/reCheckDelete/:id", async (req, res) => {
       const id = req.params.id;
       const deleteId = { _id: new ObjectId(id) };
       const deleteFromCollection = await reCheckCollection.deleteOne(deleteId);
       res.send(deleteFromCollection);
+    });
+
+    //give feedback
+    app.patch("/reCheckDelete/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const feedBackText = req.body;
+      const setUpdated = {
+        $set: {
+          feedback: feedBackText.feedback,
+        },
+      };
+      const result = await reCheckCollection.updateOne(
+        filter,
+        setUpdated,
+        options
+      );
+      res.send(result);
     });
 
     app.get("/reCheckUser", async (req, res) => {
