@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5100;
 
 require("dotenv").config();
 
@@ -180,10 +180,19 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/reCheck/:id", async (req, res) => {
+    app.get("/reCheckDelete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const deleteFromCollection = await reCheckCollection
+        .find(query)
+        .toArray();
+      res.send(deleteFromCollection);
+    });
+
+    app.delete("/reCheckDelete/:id", async (req, res) => {
       const id = req.params.id;
       const deleteId = { _id: new ObjectId(id) };
-      const deleteFromCollection = await usersCollection.deleteOne(deleteId);
+      const deleteFromCollection = await reCheckCollection.deleteOne(deleteId);
       res.send(deleteFromCollection);
     });
 
