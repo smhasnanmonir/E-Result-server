@@ -288,7 +288,8 @@ async function run() {
           age : updatedata.age,
           address : updatedata.home,
           phone : updatedata.phone,
-          gender : updatedata.gender
+          gender : updatedata.gender,
+          blood : updatedata.blood
         }
       }
       const updateInfo = await usersCollection.updateOne(query,updateDoc);
