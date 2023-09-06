@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-const port = process.env.PORT || 5100;
+const port = process.env.PORT || 5000;
 
 require("dotenv").config();
 
@@ -82,6 +82,7 @@ async function run() {
           Name: 1,
           classId: 1,
           finalTerm: 1,
+          midTerm: 1,
         },
       };
       const results = await resultCollection.findOne(query, option);
@@ -89,25 +90,38 @@ async function run() {
     });
 
     app.patch("/allResults/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const options = { upsert: true };
-      const term = req.body;
-      const final = {
-        $set: {
-          finalTerm: {
-            Bangla: parseInt(term.Bangla),
-            Biology: parseInt(term.Biology),
-            Chemistry: parseInt(term.Chemistry),
-            English: parseInt(term.English),
-            Math: parseInt(term.Math),
-            Physics: parseInt(term.Physics),
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upsert: true };
+        const term = req.body;
+        let updateTermField;
+      
+        if (req.query.term === 'finalTerm') {
+          updateTermField = 'finalTerm';
+        } else if (req.query.term === 'midTerm') {
+          updateTermField = 'midTerm';
+        } else {
+          return res.status(400).json({ error: 'Invalid term specified' });
+        }
+      
+        const updateTerm = {
+          $set: {
+            [updateTermField]: {
+              Bangla: parseInt(term.Bangla),
+              Biology: parseInt(term.Biology),
+              Chemistry: parseInt(term.Chemistry),
+              English: parseInt(term.English),
+              Math: parseInt(term.Math),
+              Physics: parseInt(term.Physics),
+            },
           },
-        },
-      };
-      const result = await resultCollection.updateOne(filter, final, options);
-      res.send(result);
-    });
+        };
+      
+        const result = await resultCollection.updateOne(filter, updateTerm, options);
+        res.send(result);
+      });
+      
+      
 
     app.post("/allResults", async (req, res) => {
       const newItem = req.body;
