@@ -290,6 +290,25 @@ async function run() {
       res.send(deleteFromCollection);
     });
 
+
+    app.patch('/updateUser', async (req, res) => {
+      const updatedata = req.body;
+      const email = updatedata.email;
+      const query = { email: email}
+      const updateDoc = {
+        $set : {
+          name : updatedata.name,
+          roll : updatedata.roll,
+          age : updatedata.age,
+          address : updatedata.home,
+          phone : updatedata.phone,
+          gender : updatedata.gender,
+          blood : updatedata.blood
+        }
+      }
+      const updateInfo = await usersCollection.updateOne(query,updateDoc);
+      res.send(updateInfo);
+    })
     //review Delete
 
     // Send a ping to confirm a successful connection
