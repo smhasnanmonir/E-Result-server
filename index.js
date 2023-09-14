@@ -1,18 +1,38 @@
+
 const express = require("express");
-
+const socketIo = require('socket.io');
+const http = require('http');
 const cors = require("cors");
-
 const jwt = require("jsonwebtoken");
 
 const app = express();
-
 const port = process.env.PORT || 5000;
 
 require("dotenv").config();
 
 app.use(cors());
-
 app.use(express.json());
+
+const server = http.createServer(app); // Use the Express app as the HTTP server
+
+// const io = socketIo(server);
+
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173", // Replace with the origin of your client application
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
+
+io.on("connection", (socket) => {
+  // console.log('someone connected')
+  socket.on("disconnect", ()=>{
+    // console.log('left');
+  })
+});
+
 
 const verifyJwt = (req, res, next) => {
   const authorization = req.headers.authorization;
@@ -65,6 +85,7 @@ async function run() {
       .collection("resultCollection"); //for getting all results
     const reCheckCollection = client.db("Eresult").collection("reCheck"); //for getting all rechecks
     const usersCollection = client.db("Eresult").collection("usersCollection"); //for getting all rechecks
+    const notificationsCollection = client.db("Eresult").collection('notifications');
 
     app.get("/allResults", async (req, res) => {
       const cursor = resultCollection.find();
@@ -211,15 +232,21 @@ async function run() {
       res.send(deleteFromCollection);
     });
 
-    //give feedback
-    app.patch("/reCheckDelete/:id", async (req, res) => {
+    //give feedback and set noitifications
+    app.patch("/reCheckFeedback/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const feedBackText = req.body;
+      const forNotify =  {
+        email : feedBackText.to,
+        notify : feedBackText.notify
+      }
+       const notify = await notificationsCollection.insertOne(forNotify)
       const setUpdated = {
         $set: {
           feedback: feedBackText.feedback,
+          rechecked: feedBackText.reCheck
         },
       };
       const result = await reCheckCollection.updateOne(
@@ -227,8 +254,28 @@ async function run() {
         setUpdated,
         options
       );
+     
+      res.send({result, notify});
+    });
+
+    app.get("/notification", async (req, res) => {
+      const email = req.query.email;
+      // console.log(email)
+      const query = {
+        email: email,
+      };
+      const result = await notificationsCollection.find(query).toArray();
       res.send(result);
     });
+
+    app.delete('/clearnoti', async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        email : email
+      }
+      const result = await notificationsCollection.deleteMany(query)
+      res.send(result);
+    })
 
     app.get("/reCheckUser", async (req, res) => {
       const email = req.query.email;
@@ -274,14 +321,20 @@ async function run() {
 
     app.patch("/userList/admin/:id", async (req, res) => {
       const id = req.params.id;
+      const doc = req.body;
       const filter = { _id: new ObjectId(id) };
+      const forNotify =  {
+        email : doc.to,
+        notify : doc.notify
+      }
+      const notify = await notificationsCollection.insertOne(forNotify)
       const updateDoc = {
         $set: {
           role: "admin",
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
+      res.send({result, notify});
     });
     app.delete("/deleteUser/:id", async (req, res) => {
       const id = req.params.id;
@@ -330,6 +383,11 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-app.listen(port, () => {
-  console.log("Port is:", port);
+// app.listen(port, () => {
+//   console.log("Port is:", port);
+  
+// });
+
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
