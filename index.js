@@ -405,6 +405,10 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+// app.get("/", (req, res) => {
+//   res.send("Server is running");
+// });
+
 // app.listen(port, () => {
 //   console.log("Port is:", port);
   
