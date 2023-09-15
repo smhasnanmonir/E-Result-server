@@ -343,6 +343,28 @@ async function run() {
       res.send(deleteFromCollection);
     });
 
+    app.get("/userInfo", async (req, res) => {
+      const email = req.query.email;
+      // console.log(email)
+      const query = {
+        email: email,
+      };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/getStats", async (req, res) => {
+      const rechekedlist = { rechecked : 'No' }
+      const adminQuery = { role: 'admin'}
+      const totaluser = await usersCollection.find().toArray();
+      const reviews = await reCheckCollection.find().toArray();
+      const pending = await reCheckCollection.find(rechekedlist).toArray();
+      const totalResult = await resultCollection.find().toArray();
+      const admin = await usersCollection.find(adminQuery).toArray();
+      const students = totaluser.length - admin.length;
+      const rechecked = reviews.length - pending.length
+      res.send({totaluser : totaluser.length, reviews: reviews.length, pending: pending.length, rechecked, admin: admin.length, students, totalResult:totalResult.length});
+    });
 
     app.patch('/updateUser', async (req, res) => {
       const updatedata = req.body;
