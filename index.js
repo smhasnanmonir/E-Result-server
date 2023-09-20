@@ -28,7 +28,7 @@ const io = socketIo(server, {
 
 io.on("connection", (socket) => {
   // console.log('someone connected')
-  socket.on("disconnect", ()=>{
+  socket.on("disconnect", () => {
     // console.log('left');
   })
 });
@@ -58,9 +58,11 @@ const verifyJwt = (req, res, next) => {
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const { error } = require("console");
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`; //use monir
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`; //use monir
 
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ir3lm70.mongodb.net/?retryWrites=true&w=majority`; //use habib
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pyqmcvy.mongodb.net/?retryWrites=true&w=majority`; //use monir
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
@@ -87,6 +89,28 @@ async function run() {
     const usersCollection = client.db("Eresult").collection("usersCollection"); //for getting all rechecks
     const notificationsCollection = client.db("Eresult").collection('notifications');
 
+
+
+    // searchbar start------------
+    const indexKeys = { Name: 1, classId: 1 };
+    const indexOptions = { Name: "NameClassId" };
+    const result = await resultCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/resultSearchByName/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await resultCollection
+        .find({
+          $or: [
+            { Name: { $regex: text, $options: "i" } },
+            { classId: { $regex: text, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+    
+    // searchbar end------------
+
     app.get("/allResults", async (req, res) => {
       const cursor = resultCollection.find();
       const result = await cursor.toArray();
@@ -111,38 +135,38 @@ async function run() {
     });
 
     app.patch("/allResults/:id", async (req, res) => {
-        const id = req.params.id;
-        const filter = { _id: new ObjectId(id) };
-        const options = { upsert: true };
-        const term = req.body;
-        let updateTermField;
-      
-        if (req.query.term === 'finalTerm') {
-          updateTermField = 'finalTerm';
-        } else if (req.query.term === 'midTerm') {
-          updateTermField = 'midTerm';
-        } else {
-          return res.status(400).json({ error: 'Invalid term specified' });
-        }
-      
-        const updateTerm = {
-          $set: {
-            [updateTermField]: {
-              Bangla: parseInt(term.Bangla),
-              Biology: parseInt(term.Biology),
-              Chemistry: parseInt(term.Chemistry),
-              English: parseInt(term.English),
-              Math: parseInt(term.Math),
-              Physics: parseInt(term.Physics),
-            },
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const term = req.body;
+      let updateTermField;
+
+      if (req.query.term === 'finalTerm') {
+        updateTermField = 'finalTerm';
+      } else if (req.query.term === 'midTerm') {
+        updateTermField = 'midTerm';
+      } else {
+        return res.status(400).json({ error: 'Invalid term specified' });
+      }
+
+      const updateTerm = {
+        $set: {
+          [updateTermField]: {
+            Bangla: parseInt(term.Bangla),
+            Biology: parseInt(term.Biology),
+            Chemistry: parseInt(term.Chemistry),
+            English: parseInt(term.English),
+            Math: parseInt(term.Math),
+            Physics: parseInt(term.Physics),
           },
-        };
-      
-        const result = await resultCollection.updateOne(filter, updateTerm, options);
-        res.send(result);
-      });
-      
-      
+        },
+      };
+
+      const result = await resultCollection.updateOne(filter, updateTerm, options);
+      res.send(result);
+    });
+
+
 
     app.post("/allResults", async (req, res) => {
       const newItem = req.body;
@@ -238,11 +262,11 @@ async function run() {
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const feedBackText = req.body;
-      const forNotify =  {
-        email : feedBackText.to,
-        notify : feedBackText.notify
+      const forNotify = {
+        email: feedBackText.to,
+        notify: feedBackText.notify
       }
-       const notify = await notificationsCollection.insertOne(forNotify)
+      const notify = await notificationsCollection.insertOne(forNotify)
       const setUpdated = {
         $set: {
           feedback: feedBackText.feedback,
@@ -254,8 +278,8 @@ async function run() {
         setUpdated,
         options
       );
-     
-      res.send({result, notify});
+
+      res.send({ result, notify });
     });
 
     app.get("/notification", async (req, res) => {
@@ -271,7 +295,7 @@ async function run() {
     app.delete('/clearnoti', async (req, res) => {
       const email = req.query.email;
       const query = {
-        email : email
+        email: email
       }
       const result = await notificationsCollection.deleteMany(query)
       res.send(result);
@@ -323,9 +347,9 @@ async function run() {
       const id = req.params.id;
       const doc = req.body;
       const filter = { _id: new ObjectId(id) };
-      const forNotify =  {
-        email : doc.to,
-        notify : doc.notify
+      const forNotify = {
+        email: doc.to,
+        notify: doc.notify
       }
       const notify = await notificationsCollection.insertOne(forNotify)
       const updateDoc = {
@@ -334,7 +358,7 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send({result, notify});
+      res.send({ result, notify });
     });
     app.delete("/deleteUser/:id", async (req, res) => {
       const id = req.params.id;
@@ -354,8 +378,8 @@ async function run() {
     });
 
     app.get("/getStats", async (req, res) => {
-      const rechekedlist = { rechecked : 'No' }
-      const adminQuery = { role: 'admin'}
+      const rechekedlist = { rechecked: 'No' }
+      const adminQuery = { role: 'admin' }
       const totaluser = await usersCollection.find().toArray();
       const reviews = await reCheckCollection.find().toArray();
       const pending = await reCheckCollection.find(rechekedlist).toArray();
@@ -363,25 +387,25 @@ async function run() {
       const admin = await usersCollection.find(adminQuery).toArray();
       const students = totaluser.length - admin.length;
       const rechecked = reviews.length - pending.length
-      res.send({totaluser : totaluser.length, reviews: reviews.length, pending: pending.length, rechecked, admin: admin.length, students, totalResult:totalResult.length});
+      res.send({ totaluser: totaluser.length, reviews: reviews.length, pending: pending.length, rechecked, admin: admin.length, students, totalResult: totalResult.length });
     });
 
     app.patch('/updateUser', async (req, res) => {
       const updatedata = req.body;
       const email = updatedata.email;
-      const query = { email: email}
+      const query = { email: email }
       const updateDoc = {
-        $set : {
-          name : updatedata.name,
-          roll : updatedata.roll,
-          age : updatedata.age,
-          address : updatedata.home,
-          phone : updatedata.phone,
-          gender : updatedata.gender,
-          blood : updatedata.blood
+        $set: {
+          name: updatedata.name,
+          roll: updatedata.roll,
+          age: updatedata.age,
+          address: updatedata.home,
+          phone: updatedata.phone,
+          gender: updatedata.gender,
+          blood: updatedata.blood
         }
       }
-      const updateInfo = await usersCollection.updateOne(query,updateDoc);
+      const updateInfo = await usersCollection.updateOne(query, updateDoc);
       res.send(updateInfo);
     })
     //review Delete
@@ -411,7 +435,7 @@ app.get("/", (req, res) => {
 
 // app.listen(port, () => {
 //   console.log("Port is:", port);
-  
+
 // });
 
 server.listen(port, () => {
