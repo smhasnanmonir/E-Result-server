@@ -1,7 +1,6 @@
-
 const express = require("express");
-const socketIo = require('socket.io');
-const http = require('http');
+const socketIo = require("socket.io");
+const http = require("http");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
@@ -21,18 +20,16 @@ const io = socketIo(server, {
   cors: {
     origin: "http://localhost:5173", // Replace with the origin of your client application
     methods: ["GET", "POST"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
-
 
 io.on("connection", (socket) => {
   // console.log('someone connected')
-  socket.on("disconnect", ()=>{
+  socket.on("disconnect", () => {
     // console.log('left');
-  })
+  });
 });
-
 
 const verifyJwt = (req, res, next) => {
   const authorization = req.headers.authorization;
@@ -85,7 +82,9 @@ async function run() {
       .collection("resultCollection"); //for getting all results
     const reCheckCollection = client.db("Eresult").collection("reCheck"); //for getting all rechecks
     const usersCollection = client.db("Eresult").collection("usersCollection"); //for getting all rechecks
-    const notificationsCollection = client.db("Eresult").collection('notifications');
+    const notificationsCollection = client
+      .db("Eresult")
+      .collection("notifications");
 
     app.get("/allResults", async (req, res) => {
       const cursor = resultCollection.find();
@@ -111,38 +110,40 @@ async function run() {
     });
 
     app.patch("/allResults/:id", async (req, res) => {
-        const id = req.params.id;
-        const filter = { _id: new ObjectId(id) };
-        const options = { upsert: true };
-        const term = req.body;
-        let updateTermField;
-      
-        if (req.query.term === 'finalTerm') {
-          updateTermField = 'finalTerm';
-        } else if (req.query.term === 'midTerm') {
-          updateTermField = 'midTerm';
-        } else {
-          return res.status(400).json({ error: 'Invalid term specified' });
-        }
-      
-        const updateTerm = {
-          $set: {
-            [updateTermField]: {
-              Bangla: parseInt(term.Bangla),
-              Biology: parseInt(term.Biology),
-              Chemistry: parseInt(term.Chemistry),
-              English: parseInt(term.English),
-              Math: parseInt(term.Math),
-              Physics: parseInt(term.Physics),
-            },
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const term = req.body;
+      let updateTermField;
+
+      if (req.query.term === "finalTerm") {
+        updateTermField = "finalTerm";
+      } else if (req.query.term === "midTerm") {
+        updateTermField = "midTerm";
+      } else {
+        return res.status(400).json({ error: "Invalid term specified" });
+      }
+
+      const updateTerm = {
+        $set: {
+          [updateTermField]: {
+            Bangla: parseInt(term.Bangla),
+            Biology: parseInt(term.Biology),
+            Chemistry: parseInt(term.Chemistry),
+            English: parseInt(term.English),
+            Math: parseInt(term.Math),
+            Physics: parseInt(term.Physics),
           },
-        };
-      
-        const result = await resultCollection.updateOne(filter, updateTerm, options);
-        res.send(result);
-      });
-      
-      
+        },
+      };
+
+      const result = await resultCollection.updateOne(
+        filter,
+        updateTerm,
+        options
+      );
+      res.send(result);
+    });
 
     app.post("/allResults", async (req, res) => {
       const newItem = req.body;
@@ -238,15 +239,15 @@ async function run() {
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const feedBackText = req.body;
-      const forNotify =  {
-        email : feedBackText.to,
-        notify : feedBackText.notify
-      }
-       const notify = await notificationsCollection.insertOne(forNotify)
+      const forNotify = {
+        email: feedBackText.to,
+        notify: feedBackText.notify,
+      };
+      const notify = await notificationsCollection.insertOne(forNotify);
       const setUpdated = {
         $set: {
           feedback: feedBackText.feedback,
-          rechecked: feedBackText.reCheck
+          rechecked: feedBackText.reCheck,
         },
       };
       const result = await reCheckCollection.updateOne(
@@ -254,8 +255,8 @@ async function run() {
         setUpdated,
         options
       );
-     
-      res.send({result, notify});
+
+      res.send({ result, notify });
     });
 
     app.get("/notification", async (req, res) => {
@@ -268,14 +269,14 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/clearnoti', async (req, res) => {
+    app.delete("/clearnoti", async (req, res) => {
       const email = req.query.email;
       const query = {
-        email : email
-      }
-      const result = await notificationsCollection.deleteMany(query)
+        email: email,
+      };
+      const result = await notificationsCollection.deleteMany(query);
       res.send(result);
-    })
+    });
 
     app.get("/reCheckUser", async (req, res) => {
       const email = req.query.email;
@@ -323,18 +324,18 @@ async function run() {
       const id = req.params.id;
       const doc = req.body;
       const filter = { _id: new ObjectId(id) };
-      const forNotify =  {
-        email : doc.to,
-        notify : doc.notify
-      }
-      const notify = await notificationsCollection.insertOne(forNotify)
+      const forNotify = {
+        email: doc.to,
+        notify: doc.notify,
+      };
+      const notify = await notificationsCollection.insertOne(forNotify);
       const updateDoc = {
         $set: {
           role: "admin",
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send({result, notify});
+      res.send({ result, notify });
     });
     app.delete("/deleteUser/:id", async (req, res) => {
       const id = req.params.id;
@@ -354,36 +355,64 @@ async function run() {
     });
 
     app.get("/getStats", async (req, res) => {
-      const rechekedlist = { rechecked : 'No' }
-      const adminQuery = { role: 'admin'}
+      const rechekedlist = { rechecked: "No" };
+      const adminQuery = { role: "admin" };
       const totaluser = await usersCollection.find().toArray();
       const reviews = await reCheckCollection.find().toArray();
       const pending = await reCheckCollection.find(rechekedlist).toArray();
       const totalResult = await resultCollection.find().toArray();
       const admin = await usersCollection.find(adminQuery).toArray();
       const students = totaluser.length - admin.length;
-      const rechecked = reviews.length - pending.length
-      res.send({totaluser : totaluser.length, reviews: reviews.length, pending: pending.length, rechecked, admin: admin.length, students, totalResult:totalResult.length});
+      const rechecked = reviews.length - pending.length;
+      res.send({
+        totaluser: totaluser.length,
+        reviews: reviews.length,
+        pending: pending.length,
+        rechecked,
+        admin: admin.length,
+        students,
+        totalResult: totalResult.length,
+      });
     });
 
-    app.patch('/updateUser', async (req, res) => {
+    // searchbar start------------
+    const indexKeys = { Name: 1, classId: 1 };
+    const indexOptions = { Name: "NameClassId" };
+    const result = await resultCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/resultSearchByName/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await resultCollection
+        .find({
+          $or: [
+            { Name: { $regex: text, $options: "i" } },
+            { classId: { $regex: text, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+
+    // searchbar end------------
+
+    app.patch("/updateUser", async (req, res) => {
       const updatedata = req.body;
       const email = updatedata.email;
-      const query = { email: email}
+      const query = { email: email };
       const updateDoc = {
-        $set : {
-          name : updatedata.name,
-          roll : updatedata.roll,
-          age : updatedata.age,
-          address : updatedata.home,
-          phone : updatedata.phone,
-          gender : updatedata.gender,
-          blood : updatedata.blood
-        }
-      }
-      const updateInfo = await usersCollection.updateOne(query,updateDoc);
+        $set: {
+          name: updatedata.name,
+          roll: updatedata.roll,
+          age: updatedata.age,
+          address: updatedata.home,
+          phone: updatedata.phone,
+          gender: updatedata.gender,
+          blood: updatedata.blood,
+        },
+      };
+      const updateInfo = await usersCollection.updateOne(query, updateDoc);
       res.send(updateInfo);
-    })
+    });
     //review Delete
 
     // Send a ping to confirm a successful connection
@@ -411,7 +440,7 @@ app.get("/", (req, res) => {
 
 // app.listen(port, () => {
 //   console.log("Port is:", port);
-  
+
 // });
 
 server.listen(port, () => {
