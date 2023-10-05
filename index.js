@@ -92,6 +92,12 @@ async function run() {
       res.send(result);
     });
 
+    app.post('/allResults', async (req, res) => {
+      const cursor = req.body;
+      const result = await resultCollection.insertOne(cursor);
+      res.send(result)
+    })
+
     // search by id
 
     app.get("/allResults/:id", async (req, res) => {
